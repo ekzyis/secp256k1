@@ -91,8 +91,12 @@ def ecdouble(p: Point) -> Point:
 
 
 def ecadd(p1: Point, p2: Point) -> Point:
-    # TODO implement
-    pass
+    # Like doubling a point, except you draw a line through p1, p2 instead of a
+    # tangent.
+    s = (p1.y - p2.y) * modinv_p(p1.x - p2.x)
+    x = s**2 - p1.x - p2.x
+    y = s*(p1.x - x) - p1.y
+    return Point(x, y)
 
 
 def ecmul(p: Point, scalar: int) -> Point:
