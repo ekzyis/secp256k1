@@ -41,8 +41,34 @@ G = Point(
 
 
 def modinv(scalar: int, mod: int) -> int:
-    # TODO implement
-    pass
+    # https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm
+    t = 0
+    r = mod
+    newt = 1
+    newr = scalar
+
+    while newr != 0:
+        q = r // newr
+        (t, newt) = (newt, t - q * newt)
+        (r, newr) = (newr, r - q * newr)
+
+    if r > 1:
+        raise ValueError(f'{scalar} mod {mod} is not invertible')
+
+    if t < 0:
+        t += mod
+
+    return t
+
+
+def modinv_n(scalar: int) -> int:
+    # scalars like private keys are chosen from [1, n-1], so we need to use mod N.
+    return modinv(scalar, N)
+
+
+def modinv_p(coordinate: int) -> int:
+    # point coordinates use mod P
+    return modinv(coordinate, P)
 
 
 def ecdouble(p: Point) -> Point:
