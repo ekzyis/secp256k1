@@ -1,6 +1,6 @@
 import unittest
 
-from secp256k1 import Point, modinv_n, modinv_p, ecdouble, ecadd, ecmul, G
+from secp256k1 import Point, modinv_n, modinv_p, ecdouble, ecadd, ecmul, G, PublicKey
 
 
 # all test values are from
@@ -118,6 +118,23 @@ class TestSecp256k1(unittest.TestCase):
             )
         ]:
             self.assertEqual(ecmul(p, scalar), multiplied)
+
+    def test_serialize(self):
+        compressed_G = bytes.fromhex(
+            "02" +
+            "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798")
+        pub = PublicKey(compressed_G)
+        self.assertEqual(pub, G)
+        self.assertEqual(pub.serialize(), compressed_G)
+
+        uncompressed_G = bytes.fromhex(
+            "04" +
+            "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798" +
+            "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
+        )
+        pub = PublicKey(uncompressed_G)
+        self.assertEqual(pub, G)
+        self.assertEqual(pub.serialize_uncompressed(), uncompressed_G)
 
 
 if __name__ == '__main__':

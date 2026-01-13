@@ -1,3 +1,6 @@
+import math
+
+
 class PrivateKey:
     def __init__(self, key: bytes):
         self._key: bytes = key
@@ -24,13 +27,46 @@ class Point:
 
 class PublicKey(Point):
     def __init__(self, key: bytes):
-        # TODO parse key in compressed (02,03) or uncompressed (04) format
         x, y = self._parse_key(key)
         super().__init__(x, y)
 
     def _parse_key(self, key: bytes):
-        # TODO parse key in compressed (02,03) or uncompressed (04) format
-        return None, None
+        if len(key) not in [33, 65]:
+            raise ValueError('invalid format')
+
+        byte0 = key[0]
+        if byte0 not in [0x02, 0x03, 0x04]:
+            raise ValueError('invalid format')
+
+        x = int.from_bytes(key[1:33], 'big')
+        y = None
+
+        if len(key) == 33:
+            # compressed format, calculate y from x
+            y_squared = (x**3 + 7) % P
+            # TODO explain why this works
+            y_root = pow(y_squared, (P + 1) // 4, P)
+            if byte0 == 0x02:
+                y = y_root
+            elif byte0 == 0x03:
+                y = -y_root % P
+            else:
+                raise ValueError('invalid parity byte')
+
+        if len(key) == 65:
+            y = int.from_bytes(key[33:], 'big')
+
+        return x, y
+
+    def serialize(self) -> bytes:
+        parity_byte = b'\x02' if self.y % 2 == 0 else b'\x03'
+        x_bytes = self.x.to_bytes(32, 'big')
+        return parity_byte + x_bytes
+
+    def serialize_uncompressed(self) -> bytes:
+        x_bytes = self.x.to_bytes(32, 'big')
+        y_bytes = self.y.to_bytes(32, 'big')
+        return b'\x04' + x_bytes + y_bytes
 
 
 # secp256k1: y^2 = x^3 + 7
