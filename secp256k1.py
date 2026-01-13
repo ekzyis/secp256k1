@@ -10,8 +10,16 @@ class PrivateKey:
 
 class Point:
     def __init__(self, x, y):
-        self._x = x
-        self._y = y
+        self.x = x % P
+        self.y = y % P
+
+    def __repr__(self):
+        return f'Point({self.x},{self.y})'
+
+    def __eq__(self, other: any) -> bool:
+        if isinstance(other, Point):
+            return self.x == other.x and self.y == other.y
+        return False
 
 
 class PublicKey(Point):
@@ -72,8 +80,14 @@ def modinv_p(coordinate: int) -> int:
 
 
 def ecdouble(p: Point) -> Point:
-    # TODO implement
-    pass
+    # From a visual perspective, to "double" a point you draw a tangent to the
+    # curve at the given point, then find the point on the curve this line
+    # intersects (there will only be one), then take the reflection of this
+    # point across the x-axis.
+    s = 3*p.x**2 * modinv_p(2*p.y)
+    x = s**2 - 2*p.x
+    y = s*(p.x - x) - p.y
+    return Point(x, y)
 
 
 def ecadd(p1: Point, p2: Point) -> Point:
