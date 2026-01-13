@@ -100,5 +100,9 @@ def ecadd(p1: Point, p2: Point) -> Point:
 
 
 def ecmul(p: Point, scalar: int) -> Point:
-    # TODO implement
-    pass
+    acc = p
+    for c in bin(scalar)[3:]:
+        acc = ecdouble(acc)
+        if c == '1':
+            acc = ecadd(acc, p)
+    return acc

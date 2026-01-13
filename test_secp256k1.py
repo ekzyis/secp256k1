@@ -1,6 +1,6 @@
 import unittest
 
-from secp256k1 import Point, modinv_n, modinv_p, ecdouble, ecadd, G
+from secp256k1 import Point, modinv_n, modinv_p, ecdouble, ecadd, ecmul, G
 
 
 # all test values are from
@@ -95,8 +95,29 @@ class TestSecp256k1(unittest.TestCase):
             self.assertEqual(ecadd(p1, p2), added)
 
     def test_ecmul(self):
-        # TODO implement
-        self.skipTest("not implemented yet")
+        for p, scalar, multiplied in [
+            (G, 1, G),
+            (
+                G,
+                3,
+                Point(
+                    112711660439710606056748659173929673102114977341539408544630613555209775888121,
+                    25583027980570883691656905877401976406448868254816295069919888960541586679410
+                )
+            ),
+            (
+                Point(
+                    5931779216637967566233586433406008694236895975927497237640909668395497878460,
+                    108034723676662315023926839724778889395235684741303646726835110732508618332209
+                ),
+                21,
+                Point(
+                    91155979132565577530378775844156264841729507079637208856460325436684643377724,
+                    56773454683867427256120814809059076759526673019470271929584303247913900962201
+                )
+            )
+        ]:
+            self.assertEqual(ecmul(p, scalar), multiplied)
 
 
 if __name__ == '__main__':
