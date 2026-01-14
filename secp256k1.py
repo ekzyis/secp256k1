@@ -94,6 +94,16 @@ class PublicKey(Point):
             p.y.to_bytes(32, 'big')
         return PublicKey(uncompressed)
 
+    def tweak_mul(self, b: bytes) -> 'PublicKey':
+        if len(b) != 32:
+            raise ValueError(f'invalid tweak: expected 32 bytes, got {len(b)} bytes')  # noqa
+        scalar = int.from_bytes(b, 'big')
+        p = ecmul(self, scalar)
+        uncompressed = b'\x04' + \
+            p.x.to_bytes(32, 'big') + \
+            p.y.to_bytes(32, 'big')
+        return PublicKey(uncompressed)
+
 
 # secp256k1: y^2 = x^3 + 7
 

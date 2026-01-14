@@ -1,6 +1,6 @@
 import unittest
 
-from secp256k1 import PublicKey, PrivateKey, Point, G, \
+from secp256k1 import PublicKey, PrivateKey, Point, G, N, \
     modinv_n, modinv_p, ecdouble, ecadd, ecmul
 
 
@@ -148,6 +148,12 @@ class TestSecp256k1(unittest.TestCase):
         tweak = bytes.fromhex("b016df28964a4f31e1021fd3f02cb05a407c3825ecc11731786b7bb80436b413")  # noqa
         tweaked_key = PublicKey(bytes.fromhex("03b4eb5a087ad7a992622f2b9558cf37447c34bb796c26506113c80e79b8894ea3"))  # noqa
         self.assertEqual(pub.tweak_add(tweak), tweaked_key)
+
+    def test_public_key_tweak_mul(self):
+        pub = PublicKey(bytes.fromhex("03f5a23765ec4ee738007911894b2f3567d2eaac69c03d54d2ee9b46597a8aefba"))  # noqa
+        tweak = (N-1).to_bytes(32, "big")  # minus-one
+        tweaked_key = PublicKey(bytes.fromhex("02f5a23765ec4ee738007911894b2f3567d2eaac69c03d54d2ee9b46597a8aefba"))  # noqa
+        self.assertEqual(pub.tweak_mul(tweak), tweaked_key)
 
 
 if __name__ == '__main__':
