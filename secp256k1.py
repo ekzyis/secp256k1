@@ -1,3 +1,8 @@
+# secp256k1.py
+# Copyright (c) 2026 ekzyis
+# Licensed under the MIT License
+
+
 class PrivateKey:
     def __init__(self, key: bytes):
         self._key: bytes = key
