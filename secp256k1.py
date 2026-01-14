@@ -7,7 +7,7 @@ class PrivateKey:
         # TODO set public key
         self.public_key: PublicKey = None
 
-    def as_bytes(self) -> bytes:
+    def serialize(self) -> bytes:
         return self._key
 
     def to_pubkey(self) -> 'PublicKey':
