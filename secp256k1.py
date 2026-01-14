@@ -10,6 +10,20 @@ class PrivateKey:
     def as_bytes(self) -> bytes:
         return self._key
 
+    def tweak_add(self, b: bytes) -> 'PrivateKey':
+        if len(b) != 32:
+            raise ValueError(f'invalid tweak: expected 32 bytes, got {len(b)} bytes')  # noqa
+        tweaked = \
+            (int.from_bytes(self._key, 'big') +
+             int.from_bytes(b, 'big')) \
+            % N
+        return PrivateKey(tweaked.to_bytes(32, 'big'))
+
+    def __eq__(self, other: any) -> bool:
+        if isinstance(other, PrivateKey):
+            return self._key == other._key
+        return False
+
 
 class Point:
     def __init__(self, x, y):
