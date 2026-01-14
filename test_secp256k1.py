@@ -143,6 +143,12 @@ class TestSecp256k1(unittest.TestCase):
         tweaked_key = PrivateKey(bytes.fromhex("288df24ed840f70a05e86fc6f00a07ec8b5b1dbbe0e1344021b52e7286d585ad"))  # noqa
         self.assertEqual(priv.tweak_add(tweak), tweaked_key)
 
+    def test_public_key_tweak_add(self):
+        pub = PublicKey(bytes.fromhex("0220bd00ab6345b7dca52e0ee8e7c6af505dff2b77b68646c3580d64badb50c6c1"))  # noqa
+        tweak = bytes.fromhex("b016df28964a4f31e1021fd3f02cb05a407c3825ecc11731786b7bb80436b413")  # noqa
+        tweaked_key = PublicKey(bytes.fromhex("03b4eb5a087ad7a992622f2b9558cf37447c34bb796c26506113c80e79b8894ea3"))  # noqa
+        self.assertEqual(pub.tweak_add(tweak), tweaked_key)
+
 
 if __name__ == '__main__':
     unittest.main()

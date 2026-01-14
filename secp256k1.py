@@ -60,10 +60,12 @@ class PublicKey(Point):
             y_squared = (x**3 + 7) % P
             # TODO explain why this works
             y_root = pow(y_squared, (P + 1) // 4, P)
+            # y_root and P - y_root are the two solutions (one even, one odd)
+            # select based on the parity byte
             if byte0 == 0x02:
-                y = y_root
+                y = y_root if y_root % 2 == 0 else P - y_root
             elif byte0 == 0x03:
-                y = -y_root % P
+                y = y_root if y_root % 2 == 1 else P - y_root
             else:
                 raise ValueError('invalid parity byte')
 
@@ -81,6 +83,16 @@ class PublicKey(Point):
         x_bytes = self.x.to_bytes(32, 'big')
         y_bytes = self.y.to_bytes(32, 'big')
         return b'\x04' + x_bytes + y_bytes
+
+    def tweak_add(self, b: bytes) -> 'PublicKey':
+        if len(b) != 32:
+            raise ValueError(f'invalid tweak: expected 32 bytes, got {len(b)} bytes')  # noqa
+        scalar = int.from_bytes(b, 'big')
+        p = ecadd(self, ecmul(G, scalar))
+        uncompressed = b'\x04' + \
+            p.x.to_bytes(32, 'big') + \
+            p.y.to_bytes(32, 'big')
+        return PublicKey(uncompressed)
 
 
 # secp256k1: y^2 = x^3 + 7
@@ -103,7 +115,8 @@ def modinv(scalar: int, mod: int) -> int:
     t = 0
     r = mod
     newt = 1
-    newr = scalar
+    # % mod makes sure we handle negative inputs
+    newr = scalar % mod
 
     while newr != 0:
         q = r // newr
