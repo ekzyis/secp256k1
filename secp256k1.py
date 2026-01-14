@@ -1,6 +1,3 @@
-import math
-
-
 class PrivateKey:
     def __init__(self, key: bytes):
         self._key: bytes = key
