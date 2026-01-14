@@ -137,6 +137,11 @@ class TestSecp256k1(unittest.TestCase):
         self.assertEqual(pub, G)
         self.assertEqual(pub.serialize_uncompressed(), uncompressed_G)
 
+    def test_private_key_to_pubkey(self):
+        priv = PrivateKey(bytes.fromhex("288df24ed840f70a05e86fc6f00a07ec8b5b1dbbe0e1344021b52e7286d585ad"))  # noqa
+        pub = PublicKey(bytes.fromhex("029d99c607f294930054b80a13fb6af542be75d750fc3cc3451e317e99511b794d"))  # noqa
+        self.assertEqual(priv.to_pubkey(), pub)
+
     def test_private_key_tweak_add(self):
         priv = PrivateKey(bytes.fromhex("532b4439bc2ca9409866c81daf77b2514568b8da3706479375724c270864d1db"))  # noqa
         tweak = bytes.fromhex("d562ae151c144dc96d81a7a94092559a00a141c859238ce86c1540d84ea6f513")  # noqa

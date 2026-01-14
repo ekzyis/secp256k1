@@ -10,6 +10,13 @@ class PrivateKey:
     def as_bytes(self) -> bytes:
         return self._key
 
+    def to_pubkey(self) -> 'PublicKey':
+        p = ecmul(G, int.from_bytes(self._key, 'big'))
+        uncompressed = b'\x04' + \
+            p.x.to_bytes(32, 'big') + \
+            p.y.to_bytes(32, 'big')
+        return PublicKey(uncompressed)
+
     def tweak_add(self, b: bytes) -> 'PrivateKey':
         if len(b) != 32:
             raise ValueError(f'invalid tweak: expected 32 bytes, got {len(b)} bytes')  # noqa
